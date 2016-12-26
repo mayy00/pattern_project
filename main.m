@@ -19,3 +19,6 @@ cluster_centers = importdata('cache/cluster_centers_500_12_1_50.mat');
 
 im = image_read(dir_path, train_names(1));
 [f,d] = extract_feature(im, feature_method);
+
+% points = detectSURFFeatures(im);
+% [features, valid_points] = extractFeatures(im, points);
