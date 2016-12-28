@@ -1,6 +1,6 @@
 dir_path = '../dataset/Images/';
 
-ccs = [5, 10, 20, 30, 40, 50, 60];
+ccs = [40, 50, 60];
 for ccind = 1 : length(ccs)
 
 
@@ -46,7 +46,12 @@ for ccind = 1 : length(ccs)
     learn = fitcecoc(trainXNorm, train_labels, 'Learners', t);
     predict_labels = predict(learn, testXNorm);
     acc = sum(predict_labels' == test_labels) / 1340;
+    
     disp(['Accuracy cluster:', num2str(model.cluster_count), ' acc:', num2str(acc)]);
+    fileID = fopen('exp.txt','a');
+    fprintf(fileID,'%s', ['Accuracy cluster:', num2str(model.cluster_count), ' acc:', num2str(acc)]);
+    fclose(fileID);
 
     cache_path = strcat('cache/kmeans', num2str(model.cluster_count), '_fm_', num2str(model.feature_method), '_ht_', num2str(histogram_type), '.mat');
+    save(cache_path);
 end
