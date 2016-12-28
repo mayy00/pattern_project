@@ -1,24 +1,52 @@
-cluster_count = 50;
-sample_image_count = 500;
-region_per_image = 12;
-feature_method = 1; % sift
-
 dir_path = '../dataset/Images/';
 
-[train_names, test_names, train_labels, test_labels] = load_data();
+ccs = [5, 10, 20, 30, 40, 50, 60];
+for ccind = 1 : length(ccs)
 
 
-% feature_matrix = sample_regions('../dataset/Images/', train_names, sample_image_count, region_per_image, feature_method);
-feature_matrix = double(importdata('cache/feature_matrix_500_12_1.mat'));
-min_normalize = min(feature_matrix);
-max_normalize = max(feature_matrix);
+    model = {};
+    model.cluster_count = ccs(ccind);
+    model.feature_method = 1; % sift
+    sample_image_count = 500;
+    region_per_image = 12;
+    histogram_type = 3;
 
-% feature_matrix = normalize(feature_matrix, min_normalize, max_normalize);
-% [~, cluster_centers] = kmeans(feature_matrix, cluster_count, 'MaxIter', 1000);
-cluster_centers = importdata('cache/cluster_centers_500_12_1_50.mat');
 
-im = image_read(dir_path, train_names(1));
-[f,d] = extract_feature(im, feature_method);
 
-% points = detectSURFFeatures(im);
-% [features, valid_points] = extractFeatures(im, points);
+    [train_names, test_names, train_labels, test_labels] = load_data();
+
+    feature_matrix = double(sample_regions('../dataset/Images/', train_names, sample_image_count, region_per_image, model.feature_method));
+    % feature_matrix = double(importdata('cache/feature_matrix_500_12_1.mat'));
+    model.min_normalize = min(feature_matrix);
+    model.max_normalize = max(feature_matrix);
+
+    feature_matrix = normalize(feature_matrix, model.min_normalize, model.max_normalize);
+    [~, model.cluster_centers] = kmeans(feature_matrix, model.cluster_count, 'MaxIter', 1000);
+    % model.cluster_centers = importdata('cache/cluster_centers_500_12_1_50.mat');
+
+    trainX = [];
+    for i = 1 : size(train_labels, 2)
+        histogram = image_histogram(dir_path, train_names(i), model, histogram_type);
+        trainX = [trainX; histogram]; 
+        % disp(['Train:', num2str(i)]);
+    end
+
+    testX = [];
+    for i = 1 : size(test_labels, 2)
+        histogram = image_histogram(dir_path, train_names(i), model, histogram_type);
+        testX = [testX; histogram]; 
+        % disp(['Test:', num2str(i)]);
+    end
+
+    minTrainX = min(trainX);
+    maxTrainX = max(trainX);
+    trainXNorm = normalize(trainX, minTrainX, maxTrainX);
+    testXNorm = normalize(testX, minTrainX, maxTrainX);
+    t = templateSVM('KernelFunction', 'linear');
+    learn = fitcecoc(trainXNorm, train_labels, 'Learners', t);
+    predict_labels = predict(learn, testXNorm);
+    acc = sum(predict_labels' == test_labels) / 1340;
+    disp(['Accuracy cluster:', num2str(model.cluster_count), ' acc:', num2str(acc)]);
+
+    cache_path = strcat('cache/kmeans', num2str(model.cluster_count), '_fm_', num2str(model.feature_method), '_ht_', num2str(histogram_type), '.mat');
+end

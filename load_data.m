@@ -17,7 +17,7 @@ for i=1:length(train_names)
 end
 
 for i=1:length(test_names)
-   test_labels = map(train_names{i,1});
+   test_labels(i) = map(train_names{i,1});
 end
 
 

@@ -10,7 +10,7 @@ for i = 1 : length(file_indices)
     im = image_read(dir_path, file_name);
     [f,d] = extract_feature(im, method);
     
-    region_indices = randperm(size(f, 1), region_per_image);
+    region_indices = randperm(size(f, 1), min(size(f,1), region_per_image));
     feature_matrix = [feature_matrix; d(region_indices,:)];
     
 end

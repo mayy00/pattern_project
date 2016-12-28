@@ -3,7 +3,7 @@
 function [ points, features] = extract_feature(im, method)
     
     if method == 1 
-        [points, features] = vl_sift(single(im)); %f: frames d:decriptors
+        [points, features] = vl_sift(single(im), 'PeakThresh', 5); %f: frames d:decriptors
         points = points';
         points = points(:,1:2);
         features = features';
