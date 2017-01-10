@@ -1,6 +1,6 @@
 dir_path = '../dataset/Images/';
 
-ccs = [40, 50, 60];
+ccs = [60];
 for ccind = 1 : length(ccs)
 
 
@@ -10,7 +10,6 @@ for ccind = 1 : length(ccs)
     sample_image_count = 500;
     region_per_image = 12;
     histogram_type = 3;
-
 
 
     [train_names, test_names, train_labels, test_labels] = load_data();

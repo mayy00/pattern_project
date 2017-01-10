@@ -1,0 +1,1 @@
+Accuracy cluster:40 acc:0.71269Accuracy cluster:50 acc:0.89552Accuracy cluster:60 acc:0.95672
