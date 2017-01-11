@@ -1,6 +1,6 @@
 dir_path = '../dataset/Images/';
 
-ccs = [60];
+ccs = [5];
 for ccind = 1 : length(ccs)
 
 
